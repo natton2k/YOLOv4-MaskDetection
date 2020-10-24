@@ -71,6 +71,7 @@ We already have 6 files for 2 categories: face detection and mask detection.
 But feel free to customize your config.
 
 After that, you need to make sure that you have the correct file path at line 5, 6, 7 in detect.py
+
 Ex:
 ```sh
 labels_path = "yolo-custom\\face.names"
