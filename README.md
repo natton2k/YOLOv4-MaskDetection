@@ -47,11 +47,10 @@ pip install numpy
 ```
 *openCV 
 For Window: https://pypi.org/project/opencv-python/
-
-For Raspberry 4, for the love of god please follow this link: https://qengineering.eu/install-opencv-4.4-on-raspberry-pi-4.html
 ```sh
 pip install opencv-python
 ```
+For Raspberry 4, for the love of god please follow this link: https://qengineering.eu/install-opencv-4.4-on-raspberry-pi-4.html
 
 ### Installation
 
