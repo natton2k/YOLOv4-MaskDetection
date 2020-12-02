@@ -46,6 +46,7 @@ https://www.python.org/downloads/
 pip install numpy
 ```
 *openCV 
+
 For Window: https://pypi.org/project/opencv-python/
 ```sh
 pip install opencv-python
