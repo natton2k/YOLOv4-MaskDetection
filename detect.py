@@ -2,11 +2,11 @@ import cv2
 import numpy as np
 
 # load the custom class labels
-labels_path = "yolo-custom\\face.names"
+labels_path = "yolo-custom/mask.names"
 labels = open(labels_path).read().strip().split("\n")
 
-weights_path = "yolo-custom\yolov4-tiny-custom-face-detection.weights"
-config_path = "yolo-custom\yolov4-tiny-custom-face-detection.cfg"
+weights_path = "yolo-custom/yolov4-tiny-custom-mask-detection.weights"
+config_path = "yolo-custom/yolov4-tiny-custom-mask-detection.cfg"
 
 labels = open(labels_path).read().strip().split("\n")
 np.random.seed(42)
@@ -17,6 +17,9 @@ print("[INFO] loading YOLO from disk...")
 net = cv2.dnn.readNet(config_path, weights_path)
 ln = net.getLayerNames()
 ln = [ln[i[0] - 1] for i in net.getUnconnectedOutLayers()]
+for x in range(1,79):
+    print(x)
+    print(net.getLayer(x).blobs)
 
 
 def detect(frame):
