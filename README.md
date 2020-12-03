@@ -72,7 +72,7 @@ Check if the MLX90640 sensor is working correctly (see if the number 33 appear):
 1. Install the visualization library in Python 3
 
 ```sh
-sudo pip3 install matplotlib scripy numpy
+sudo pip3 install matplotlib scipy numpy
 ```
 
 
