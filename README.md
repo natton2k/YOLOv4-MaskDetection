@@ -60,6 +60,41 @@ Clone the repo
 git clone https://github.com/TienTruong98/Hackathon
 ```
 
+---------
+### Setting up the libraries for the Melexis MLX90640
+
+```
+Check if the MLX90640 sensor is working correctly (see if the number 33 appear):
+  sudo i2cdetect -y 1
+```
+
+
+1. Install the visualization library in Python 3
+
+```sh
+sudo pip3 install matplotlib scripy numpy
+```
+
+
+2. Install the I2C tools:
+```sh
+sudo apt-get install -y python-smbus
+sudo apt-get install -y i2c-tools
+```
+
+
+3. Install the Adafruit MLX90640 library:
+```sh
+sudo pip3 install RPI.GPIO adafruit-blinka
+sudo pip3 install adafruit-circuitpython-mlx90640
+```
+
+### Run the thermal camera script:
+
+```sh
+python3 thermal.py
+```
+
 <!-- USAGE EXAMPLES -->
 ## Usage
 
