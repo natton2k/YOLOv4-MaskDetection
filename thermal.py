@@ -39,9 +39,15 @@ ax_background = fig.canvas.copy_from_bbox(ax.bbox) # copy background
 fig.show() # show the figure before blitting
 
 frame = np.zeros(mlx_shape[0] * mlx_shape[1]) # 768 pts
-def plot_update(x,y,w,h):
+
+
+def calculate_tempature(data_array):
+    # Tính nhiệt face
+    #print(str(data_array[y:y+h,x:w+x]))
+     vface_temp = round(np.max(data_array[y:y+h,x:w+x]), 2)
+     return vface_temp
+def plot_update(x,y,w,h, frame):
     fig.canvas.restore_region(ax_background) # restore background
-    mlx.getFrame(frame) # read mlx90640
     data_array = np.fliplr(np.reshape(frame,mlx_shape)) # reshape, flip data
     data_array = ndimage.zoom(data_array,mlx_interp_val) # interpolate
         # Vẽ ảnh nhiệt lên plot
@@ -50,13 +56,7 @@ def plot_update(x,y,w,h):
     therm1.set_array(data_array)
     therm1.set_clim(vmin=vmin, vmax=vmax)
     ax.draw_artist(therm1)  # draw new thermal image
-        # Tính nhiệt face
-    #print(str(data_array[y:y+h,x:w+x]))
-    vface_temp = round(np.max(data_array[y:y+h,x:w+x]), 2)
-    if vface_temp < 38:
-        print('Normal temperature: ' + str(vface_temp))
-    else:
-        print('High temperature: ' + str(vface_temp))
+
     fig.canvas.blit(ax.bbox)
     fig.canvas.flush_events()
     cbar.on_mappable_changed(therm1) # update colorbar range
@@ -64,13 +64,19 @@ def plot_update(x,y,w,h):
     ax.draw_artist(therm1) # draw new thermal image
     fig.canvas.blit(ax.bbox) # draw background
     fig.canvas.flush_events() # show the new image
-    return
+    return data_array
 
 t_array = []
 while True:
   #  t1 = time.monotonic() # for determining frame rate
+    mlx.getFrame(frame) # read mlx90640
     try:
-        plot_update(cal_temp_width, cal_temp_height, cal_temp_col, cal_temp_height) # update plot
+        data_array = plot_update(cal_temp_width, cal_temp_height, cal_temp_col, cal_temp_height, frame) # update plot
+        temp = calculate_tempature(data_array)
+        if temp < 38:
+            print('Normal temperature: ' + str(vface_temp))
+        else:
+            print('High temperature: ' + str(vface_temp))
     except:
         continue
     # approximating frame rate
