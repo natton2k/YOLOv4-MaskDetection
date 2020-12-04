@@ -107,18 +107,18 @@ To begin using this, you need to have 3 config files in the yolo-custom director
 We already have 6 files for 2 categories: face detection and mask detection. 
 But feel free to customize your config.
 
-After that, you need to make sure that you have the correct file path at line 5, 6, 7 in detect.py
+~~ After that, you need to make sure that you have the correct file path at line 5, 6, 7 in detect.py ~~
 
-Ex:
-```sh
-labels_path = "yolo-custom\\face.names"
-weights_path = "yolo-custom\yolov4-tiny-custom-face-detection.weights"
-config_path = "yolo-custom\yolov4-tiny-custom-face-detection.cfg"
-```
-After that, you just need to run the run.py file in the command line to begin detect things.
-```sh
-python run.py
-```
+~~ Ex: ~~
+~~ ```sh ~~ 
+~~ labels_path = "yolo-custom\\face.names" ~~ 
+~~ weights_path = "yolo-custom\yolov4-tiny-custom-face-detection.weights" ~~ 
+~~ config_path = "yolo-custom\yolov4-tiny-custom-face-detection.cfg" ~~ 
+~~ ``` ~~ 
+After that, you just need to run the run.py file in the command line to begin detect things. ~~ 
+~~  ```sh ~~ 
+~~ python run.py ~~ 
+~~  ``` ~~ 
 
 <!-- CONTACT -->
 ## Contact
@@ -132,3 +132,13 @@ Ngo Nguyen Bang - bangmapleproject@gmail.com
 ## Acknowledgements
 
 * https://www.pyimagesearch.com/2018/11/12/yolo-object-detection-with-opencv/
+
+
+## Troubleshooting
+If you failed to run the Python code with the error:
+ ```moduleNotFoundError: No module named 'board'```
+
+ Please kindly uninstall the module by using the following bash command:
+ ```
+sudo pip3 uninstall board
+ ```

@@ -1,86 +1,82 @@
 from datetime import datetime
+import sqlite3
 import time,board,busio
 import numpy as np
 import adafruit_mlx90640
 import matplotlib.pyplot as plt
 from scipy import ndimage
 
-cal_temp_col = 5
-cal_temp_row = 5
-cal_temp_width = 24
-cal_temp_height = 32
+#################################
+# Configuration
 
-i2c = busio.I2C(board.SCL, board.SDA, frequency=800000) # setup I2C
+# DATABASE
+DATABASE_LOCATION = "thermal.db"
+
+# DATABSE QUERY
+INSERT_QUERY = "INSERT INTO ThermalData VALUES(?,?)"
+
+# MLX90640
+MLX90640_BUS_FREQUENCY = 800000
+MLX90640_WIDTH = 24
+MLX90640_HEIGHT = 32
+MLX90640_INTERPOLATE_VALUE = 10
+
+# PRE-DEFINE CONST VALUE
+NUM_OF_COLUMNS_CALCULATING = 50
+NUM_OF_ROWS_CALCULATING = 50
+WIDTH_SIZE_CALCULATING = 24
+HEIGHT_SIZE_CALCULATING = 32
+ROUNDING_NUMBER = 5
+#################################
+
+i2c = busio.I2C(board.SCL, board.SDA, frequency=MLX90640_BUS_FREQUENCY) # setup I2C
 mlx = adafruit_mlx90640.MLX90640(i2c) # begin MLX90640 with I2C comm
 mlx.refresh_rate = adafruit_mlx90640.RefreshRate.REFRESH_16_HZ # set refresh rate
-mlx_shape = (24,32) # mlx90640 shape
+mlx_shape = (MLX90640_WIDTH, MLX90640_HEIGHT) # mlx90640 shape
 
-mlx_interp_val = 10 # interpolate # on each dimension
-mlx_interp_shape = (mlx_shape[0]*mlx_interp_val,
-                    mlx_shape[1]*mlx_interp_val) # new shape
+mlx_interp_val = MLX90640_INTERPOLATE_VALUE # interpolate # on each dimension
+mlx_interp_shape = (mlx_shape[0] * mlx_interp_val, mlx_shape[1] * mlx_interp_val) # new shape
 
-fig = plt.figure(figsize=(5,7)) # start figure
-ax = fig.add_subplot(111) # add subplot
-fig.subplots_adjust(0.05,0.05,0.95,0.95) # get rid of unnecessary padding
-fig = plt.figure(figsize=(8, 6))  # start figure
-fig.canvas.set_window_title('Test')
-fig.canvas.toolbar_visible = True
-ax = fig.add_subplot(1, 2, 1)  # add subplot
-#ax2 = fig.add_subplot(1, 2, 2)
-fig.subplots_adjust(0.05, 0.05, 0.95, 0.95)  # get rid of unnecessary padding
-
-therm1 = ax.imshow(np.zeros(mlx_interp_shape),interpolation='none',
-                   cmap=plt.cm.bwr,vmin=25,vmax=45) # preemptive image
-cbar = fig.colorbar(therm1) # setup colorbar
-cbar.set_label('Temperature [$^{\circ}$C]',fontsize=14) # colorbar label
-
-fig.canvas.draw() # draw figure to copy background
-ax_background = fig.canvas.copy_from_bbox(ax.bbox) # copy background
-fig.show() # show the figure before blitting
-
+# We got number 768 pts because of 24 * 32
 frame = np.zeros(mlx_shape[0] * mlx_shape[1]) # 768 pts
 
+# Getting connection from database
+conn = sqlite3.connect(DATABASE_LOCATION)
+if conn is None:
+    print("Connecting to database failed. Please check the code")
+    exit(0)
 
-def calculate_tempature(data_array):
-    # Tính nhiệt face
-    #print(str(data_array[y:y+h,x:w+x]))
-     vface_temp = round(np.max(data_array[y:y+h,x:w+x]), 2)
-     return vface_temp
-def plot_update(x,y,w,h, frame):
-    fig.canvas.restore_region(ax_background) # restore background
+
+def calculate_temp(x,y,w,h, frame):
+    # Tinh max toan bo
+    # Tinh average toan bo
+    # Dua vo toa do cua hinh chu nhat gom (x,y,w,h)
+    # Tinh max trong hinh chu nhat do va tinh average trong hinh chu nhat
     data_array = np.fliplr(np.reshape(frame,mlx_shape)) # reshape, flip data
     data_array = ndimage.zoom(data_array,mlx_interp_val) # interpolate
-        # Vẽ ảnh nhiệt lên plot
-    vmin = round(np.min(data_array), 2)
-    vmax = round(np.max(data_array), 2)
-    therm1.set_array(data_array)
-    therm1.set_clim(vmin=vmin, vmax=vmax)
-    ax.draw_artist(therm1)  # draw new thermal image
+    return round(np.max(data_array[y:y+h, x:w+x]), ROUNDING_NUMBER)
 
-    fig.canvas.blit(ax.bbox)
-    fig.canvas.flush_events()
-    cbar.on_mappable_changed(therm1) # update colorbar range
+#
 
-    ax.draw_artist(therm1) # draw new thermal image
-    fig.canvas.blit(ax.bbox) # draw background
-    fig.canvas.flush_events() # show the new image
-    return data_array
+#Neu param truyen vao la: ("all", "average")
+# -> Thi dung 24x32 co san tinh average temp
+# ? Neu param truyen vao la: ("rect", "average", "*class Rect*")
+# -> Tinh avg temp cua box do
+#
 
-t_array = []
+# Main program
 while True:
-  #  t1 = time.monotonic() # for determining frame rate
     mlx.getFrame(frame) # read mlx90640
     try:
-        data_array = plot_update(cal_temp_width, cal_temp_height, cal_temp_col, cal_temp_height, frame) # update plot
-        temp = calculate_tempature(data_array)
+        temp = calculate_temp(WIDTH_SIZE_CALCULATING, HEIGHT_SIZE_CALCULATING,
+                              NUM_OF_COLUMNS_CALCULATING, NUM_OF_ROWS_CALCULATING, frame) # update plot
+        unix_time = int(time.mktime(datetime.now().timetuple()))
+        values = (temp,unix_time)
         if temp < 38:
-            print('Normal temperature: ' + str(vface_temp))
+            print(values)
+            #print('Normal temperature: ' + str(temp))
         else:
-            print('High temperature: ' + str(vface_temp))
+            print(values)
+            #print('High temperature: ' + str(temp))
     except:
         continue
-    # approximating frame rate
-   # t_array.append(time.monotonic()-t1)
-    #if len(t_array)>10:
-     #   t_array = t_array[1:] # recent times for frame rate approx
-    #print('Frame Rate: {0:2.1f}fps'.format(len(t_array)/np.sum(t_array)))

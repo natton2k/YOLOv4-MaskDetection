@@ -1,14 +1,29 @@
 import cv2
 import numpy as np
+import os
 
-# load the custom class labels
-labels_path = "yolo-custom/mask.names"
+
+weights_path = ""
+config_path = ""
+labels_path = ""
+
+if os.name == "nt":
+    labels_path = "yolo-custom\\mask.names"
+    weights_path = "yolo-custom\\yolov4-tiny-custom-mask-detection.weights"
+    config_path = "yolo-custom\\yolov4-tiny-custom-mask-detection.cfg"
+else:
+    labels_path = "yolo-custom/mask.names"
+    weights_path = "yolo-custom/yolov4-tiny-custom-mask-detection.weights"
+    config_path = "yolo-custom/yolov4-tiny-custom-mask-detection.cfg"
+
+if labels_path == "" or config_path == "" or weights_path == "":
+    print("Failed to load the config or weights or labels path. Check the configuration.")
+    exit(0)
+
+# load the custom class labels 
 labels = open(labels_path).read().strip().split("\n")
 
-weights_path = "yolo-custom/yolov4-tiny-custom-mask-detection.weights"
-config_path = "yolo-custom/yolov4-tiny-custom-mask-detection.cfg"
-
-labels = open(labels_path).read().strip().split("\n")
+#Duplicated code found: labels = open(labels_path).read().strip().split("\n")
 np.random.seed(42)
 COLORS = np.random.randint(0, 255, size=(len(labels), 3),
                            dtype="uint8")
@@ -17,7 +32,7 @@ print("[INFO] loading YOLO from disk...")
 net = cv2.dnn.readNet(config_path, weights_path)
 ln = net.getLayerNames()
 ln = [ln[i[0] - 1] for i in net.getUnconnectedOutLayers()]
-for x in range(1,79):
+for x in range(1, 79):
     print(x)
     print(net.getLayer(x).blobs)
 
@@ -84,5 +99,5 @@ def detect(frame):
             cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
             text = "{}: {:.4f}".format(labels[classIDs[i]], confidences[i])
             cv2.putText(frame, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX,
-                    0.5, color, 2)
+                        0.5, color, 2)
     return frame
