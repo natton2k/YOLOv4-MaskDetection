@@ -20,7 +20,11 @@ public class ThermalData implements Serializable {
     @NonNull
     @Column(name = "Temperature")
     private double temp;
+
     @Column(name = "CurrentTime")
     private Integer time;
+
+    @Column(name = "Image")
+    private byte time;
 
 }
