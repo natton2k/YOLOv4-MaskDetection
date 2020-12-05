@@ -132,20 +132,24 @@ def calculate_temp(x, y, w, h, frame, args: tuple):
 # -> Tinh avg temp cua box do
 #
 
+def catch_temp():
+    mlx.getFrame(frame)  # read mlx90640
+    try:
+        temp = calculate_temp(WIDTH_SIZE_CALCULATING, HEIGHT_SIZE_CALCULATING,
+                              NUM_OF_COLUMNS_CALCULATING, NUM_OF_ROWS_CALCULATING, frame, ('all','average'))  # update plot
+        unix_time = int(time.mktime(datetime.now().timetuple()))
+        values = (temp, unix_time)
+        if temp < 38:
+            print(values)
+            # print('Normal temperature: ' + str(temp))
+        else:
+            print(values)
+            # print('High temperature: ' + str(temp))
+    except Exception as e:
+        print(e)
+
 if __name__ == "__main__":
 # Main program
     while True:
-        mlx.getFrame(frame)  # read mlx90640
-        try:
-            temp = calculate_temp(WIDTH_SIZE_CALCULATING, HEIGHT_SIZE_CALCULATING,
-                                  NUM_OF_COLUMNS_CALCULATING, NUM_OF_ROWS_CALCULATING, frame, ('all','average'))  # update plot
-            unix_time = int(time.mktime(datetime.now().timetuple()))
-            values = (temp, unix_time)
-            if temp < 38:
-                print(values)
-                # print('Normal temperature: ' + str(temp))
-            else:
-                print(values)
-                # print('High temperature: ' + str(temp))
-        except Exception as e:
-            print(e)
+        catch_temp()
+

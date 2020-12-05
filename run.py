@@ -9,15 +9,17 @@ if not cap.isOpened():
 i = 0
 #c = cascade.get_cascade()
 while True:
-    start = time.time()
     ret, frame = cap.read()
-    idxs, boxes, classIDs, confidences = detect.detect(frame)
-    #frame = detect.draw_frame(idxs, boxes, classIDs, confidences, frame)
-    print(detect.output_info(idxs, boxes, classIDs, confidences))
-    #frame = cascade.detect_face(frame, c)
-    #cv2.imshow('frame', frame)
-    end = time.time()
-    print(end-start)
+    if cv2.waitKey(1) == ord('x'):
+        start = time.time()
+        idxs, boxes, classIDs, confidences = detect.detect(frame)
+        #frame = detect.draw_frame(idxs, boxes, classIDs, confidences, frame)
+        print(detect.output_info(idxs, boxes, classIDs, confidences))
+        #frame = cascade.detect_face(frame, c)
+
+        end = time.time()
+        print(end-start)
+    cv2.imshow('frame', frame)
     if cv2.waitKey(1) == ord('q'):
         break
 
