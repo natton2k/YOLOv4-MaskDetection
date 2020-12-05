@@ -87,6 +87,11 @@ def detect(frame):
     # bounding boxes
     idxs = cv2.dnn.NMSBoxes(boxes, confidences, 0.5,
                             0.3)
+    draw_frame(idxs, frame)
+    return frame
+
+
+def draw_frane(idxs, frame):
     # ensure at least one detection exists
     if len(idxs) > 0:
         # loop over the indexes we are keeping
@@ -100,4 +105,5 @@ def detect(frame):
             text = "{}: {:.4f}".format(labels[classIDs[i]], confidences[i])
             cv2.putText(frame, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX,
                         0.5, color, 2)
+    
     return frame

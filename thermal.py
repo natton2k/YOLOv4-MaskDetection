@@ -101,10 +101,10 @@ def calculate_temp(x, y, w, h, frame, args: tuple):
         raise Exception("Please pass the required argument (tuple).")
     else:
         data_array_input = None
-        if args.count == 3:
+        if len(args) == 3:
             if args[0] == "rect" and isinstance(args[2], Rect) is True:
                 data_array_input = data_array[args[2].getY():args[2].getH(), args[2].getX():args[2].getW()]
-        elif args.count == 2:
+        elif len(args) == 2:
             if args[0] == "all":
                 data_array_input = data_array[y:y+h, x:w+x]
         else:
@@ -132,20 +132,20 @@ def calculate_temp(x, y, w, h, frame, args: tuple):
 # -> Tinh avg temp cua box do
 #
 
-
+if __name__ == "__main__":
 # Main program
-while True:
-    mlx.getFrame(frame)  # read mlx90640
-    try:
-        temp = calculate_temp(WIDTH_SIZE_CALCULATING, HEIGHT_SIZE_CALCULATING,
-                              NUM_OF_COLUMNS_CALCULATING, NUM_OF_ROWS_CALCULATING, frame, None)  # update plot
-        unix_time = int(time.mktime(datetime.now().timetuple()))
-        values = (temp, unix_time)
-        if temp < 38:
-            print(values)
-            # print('Normal temperature: ' + str(temp))
-        else:
-            print(values)
-            # print('High temperature: ' + str(temp))
-    except:
-        continue
+    while True:
+        mlx.getFrame(frame)  # read mlx90640
+        try:
+            temp = calculate_temp(WIDTH_SIZE_CALCULATING, HEIGHT_SIZE_CALCULATING,
+                                  NUM_OF_COLUMNS_CALCULATING, NUM_OF_ROWS_CALCULATING, frame, ('all','average'))  # update plot
+            unix_time = int(time.mktime(datetime.now().timetuple()))
+            values = (temp, unix_time)
+            if temp < 38:
+                print(values)
+                # print('Normal temperature: ' + str(temp))
+            else:
+                print(values)
+                # print('High temperature: ' + str(temp))
+        except Exception as e:
+            print(e)
