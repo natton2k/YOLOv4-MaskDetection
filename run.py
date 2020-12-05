@@ -11,10 +11,11 @@ i = 0
 while True:
     start = time.time()
     ret, frame = cap.read()
-    frame = detect.detect(frame)
-
+    idxs, boxes, classIDs, confidences = detect.detect(frame)
+    #frame = detect.draw_frame(idxs, boxes, classIDs, confidences, frame)
+    print(detect.output_info(idxs, boxes, classIDs, confidences))
     #frame = cascade.detect_face(frame, c)
-    cv2.imshow('frame', frame)
+    #cv2.imshow('frame', frame)
     end = time.time()
     print(end-start)
     if cv2.waitKey(1) == ord('q'):

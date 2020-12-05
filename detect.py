@@ -20,7 +20,7 @@ if labels_path == "" or config_path == "" or weights_path == "":
     print("Failed to load the config or weights or labels path. Check the configuration.")
     exit(0)
 
-# load the custom class labels 
+# load the custom class labels
 labels = open(labels_path).read().strip().split("\n")
 
 #Duplicated code found: labels = open(labels_path).read().strip().split("\n")
@@ -32,10 +32,34 @@ print("[INFO] loading YOLO from disk...")
 net = cv2.dnn.readNet(config_path, weights_path)
 ln = net.getLayerNames()
 ln = [ln[i[0] - 1] for i in net.getUnconnectedOutLayers()]
-for x in range(1, 79):
-    print(x)
-    print(net.getLayer(x).blobs)
 
+
+def output_info(idxs, boxes, classIDs, confidences):
+    info = []
+    if len(idxs) > 0:
+        # loop over the indexes we are keeping
+        for i in idxs.flatten():
+            # extract the bounding box coordinates
+            (x, y) = (boxes[i][0], boxes[i][1])
+            (w, h) = (boxes[i][2], boxes[i][3])
+            info.append([x,y,w,h, labels[classIDs[i]],confidences[i]])
+    return info
+
+def draw_frame(idxs, boxes, classIDs, confidences, frame):
+    # ensure at least one detection exists
+    if len(idxs) > 0:
+        # loop over the indexes we are keeping
+        for i in idxs.flatten():
+            # extract the bounding box coordinates
+            (x, y) = (boxes[i][0], boxes[i][1])
+            (w, h) = (boxes[i][2], boxes[i][3])
+            # draw a bounding box rectangle and label on the frame
+            color = [int(c) for c in COLORS[classIDs[i]]]
+            cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
+            text = "{}: {:.4f}".format(labels[classIDs[i]], confidences[i])
+            cv2.putText(frame, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX,
+                        0.5, color, 2)
+    return frame
 
 def detect(frame):
     H, W = frame.shape[:2]
@@ -87,23 +111,6 @@ def detect(frame):
     # bounding boxes
     idxs = cv2.dnn.NMSBoxes(boxes, confidences, 0.5,
                             0.3)
-    draw_frame(idxs, frame)
-    return frame
+    return idxs, boxes, classIDs, confidences
 
 
-def draw_frane(idxs, frame):
-    # ensure at least one detection exists
-    if len(idxs) > 0:
-        # loop over the indexes we are keeping
-        for i in idxs.flatten():
-            # extract the bounding box coordinates
-            (x, y) = (boxes[i][0], boxes[i][1])
-            (w, h) = (boxes[i][2], boxes[i][3])
-            # draw a bounding box rectangle and label on the frame
-            color = [int(c) for c in COLORS[classIDs[i]]]
-            cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
-            text = "{}: {:.4f}".format(labels[classIDs[i]], confidences[i])
-            cv2.putText(frame, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX,
-                        0.5, color, 2)
-    
-    return frame
