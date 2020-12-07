@@ -142,3 +142,15 @@ If you failed to run the Python code with the error:
  ```
 sudo pip3 uninstall board
  ```
+
+ --------
+
+ # TO-DO:
+
+ ```
+
+  1. 
+  2.
+  3.
+
+ ```
