@@ -2,7 +2,7 @@ import detect
 import cv2
 import time
 import cascade
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture('rtsp://admin:admin@192.168.1.105:8554/unicast')
 if not cap.isOpened():
     print("Cannot open camera")
     exit()
@@ -19,6 +19,8 @@ while True:
 
         end = time.time()
         print(end-start)
+    #idxs, boxes, classIDs, confidences = detect.detect(frame)
+    #frame = detect.draw_frame(idxs, boxes, classIDs, confidences, frame)
     cv2.imshow('frame', frame)
     if cv2.waitKey(1) == ord('q'):
         break
